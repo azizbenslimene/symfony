@@ -6,6 +6,7 @@ use App\Repository\EventUserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventUserRepository::class)]
 class EventUser
@@ -16,21 +17,33 @@ class EventUser
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"Le nom ne doit pas être vide.")]
+    #[Assert\Type(type:"string", message:"Le nom doit être une chaîne de caractères.")]
+    #[Assert\Regex(
+        pattern:"/^[^\d]+$/",
+        message:"Le nom ne doit pas contenir de chiffres.")]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"La date ne doit pas être vide.")]
+    
     private ?string $date = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"Le lieu ne doit pas être vide.")]
     private ?string $lieu = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"La description ne doit pas être vide.")]
     private ?string $description = null;
+
 
     #[ORM\Column(length: 255)]
     private ?string $image = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message:"Le prix ne doit pas être vide.")]
+    #[Assert\Type(type:"integer", message:"Le prix doit être un entier.")]
     private ?int $prix = null;
 
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: Reservation::class)]

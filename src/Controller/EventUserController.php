@@ -69,21 +69,39 @@ return $this->renderForm('event_user/add.html.twig',['f'=>$form]);
 }
 
 #[Route('/updateEvent/{id}', name: 'event_update')]
-    public function updateEvent(Response $req, ManagerRegistry $manager,$id,EventUserRepository $repo): Response{
-        $em = $manager -> getManager();
-        $event = $repo->find($id);
-       //Appel formulaire
-       $form=$this->createForm(EventUserType::class,$event);
-       $form->handleRequest($req);
+public function updateEvent(Request $request, ManagerRegistry $manager, $id, EventUserRepository $repo): Response
+{
+    $entityManager = $manager->getManager();
+    $event = $repo->find($id);
 
-    if($form->isSubmitted()){    
-        
-        $em->persist($event);///bring req
-        $em->flush();
-        return $this->redirectToRoute('eventuser_getall') ;
+    if (!$event) {
+        throw $this->createNotFoundException('Événement non trouvé avec l\'id ' . $id);
     }
-    return $this->renderForm('event_user/add.html.twig',['f'=>$form]);
+
+    // Appel du formulaire en incluant seulement les champs que vous voulez mettre à jour
+    $form = $this->createFormBuilder($event)
+        ->add('nom')
+        ->add('date')
+        ->add('lieu')
+        ->add('description')
+        ->add('prix')
+        ->getForm();
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Persistez les modifications dans la base de données
+        $entityManager->persist($event);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('eventuser_getall');
     }
+
+    return $this->render('event_user/update.html.twig', [
+        'f' => $form->createView(),
+    ]);
+}
+
 
     #[Route('/deleteEvent/{id}',name: 'event_delete')]
     public function deleteEventForm ( ManagerRegistry $manager, $id, EventUserRepository $repo): Response {
