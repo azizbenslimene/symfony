@@ -17,26 +17,20 @@
                         <th scope="col">CIN</th>
                         <th scope="col">Nom utilisateur</th>
                         <th scope="col">Prénom utilisateur</th>
-                        <th scope="col">Action</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
                     {% for reservation in events %}
                     <tr class="table-active">
-                        <td>{{ reservation.event.nom}}</td>
-                        <td>{{ reservation.event.date}}</td>
-                        <td>{{ reservation.event.lieu }}</td>
-                        <td>{{ reservation.event.prix }}</td>
+                        <td>{{ reservation.event.getNom()}}</td>
+                        <td>{{ reservation.event.getDate()}}</td>
+                        <td>{{ reservation.event.getLieu()}}</td>
+                        <td>{{ reservation.event.getPrix()}}</td>
                         <td>{{ reservation.cin }}</td>
                         <td>{{ reservation.getNomU() }}</td>
                         <td>{{ reservation.getPrenomU() }}</td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <a href="{{ path('event_update', {'id': reservation.event.id}) }}" class="btn btn-primary">Edit</a>
-                                <span style="margin-right: 10px;"></span> <!-- Add right margin for spacing -->
-                                <a href="{{ path('event_delete', {'id': reservation.event.id}) }}" class="btn btn-danger">Delete</a>
-                            </div>
-                        </td>
+                       
                     </tr>
                     {% endfor %}
                 </tbody>

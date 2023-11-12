@@ -47,7 +47,7 @@ class EventUserRepository extends ServiceEntityRepository
 //    }
 
 
-public function findByRev_Event(){
+/*public function findByRev_Event(){
     $em = $this->getEntityManager();
     return $em->createQuery('
         SELECT r.cin, r.nom_u, r.prenom_u, e.nom AS event_name, e.date, e.lieu, e.description, e.image, e.prix
@@ -55,7 +55,7 @@ public function findByRev_Event(){
         JOIN r.event e WITH r.event = e.id
     ')
     ->getResult();
-}
+}*/
 
 
 }

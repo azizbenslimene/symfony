@@ -123,25 +123,30 @@ public function updateEvent(Request $request, ManagerRegistry $manager, $id, Eve
  
     
 
-    #[Route('/list_resv/{id}', name: 'resv_afficeh')]
-    function findByRev(EventUserRepository $repo,$id, ManagerRegistry $manager, ReservationRepository $reservationRepository)
-    {
-        $em = $manager -> getManager();
-    $reservation = new Reservation;
+    #[Route('/list_resv/{id}', name: 'resv_affiche')]
+function findByRev($id, EventUserRepository $repo, ManagerRegistry $manager, ReservationRepository $reservationRepository): Response
+{
+    $em = $manager->getManager();
     $event = $repo->find($id);
-    $reservation->setcin(12345678);
+
+    // Créer une nouvelle réservation pour cet événement
+    $reservation = new Reservation();
+    $reservation->setCin(12345678);
     $reservation->setNomU('aziz');
     $reservation->setPrenomU('benslimene');
     $reservation->setEvent($event);
-    
+
     $em->persist($reservation);
     $em->flush();
-  
-        $list = $reservationRepository->findById($id) ;
-        return $this->render('event_user/getresv.html.twig', [
-            'events' => $list,
-        ]);
 
-    }
+    // Récupérer la liste de toutes les réservations
+    $list = $reservationRepository->findAll();
+
+    return $this->render('event_user/getresv.html.twig', [
+        'events' => $list,
+    ]);
+}
+
+    
 
 }
