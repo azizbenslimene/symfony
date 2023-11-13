@@ -110,10 +110,10 @@ public function updateEvent(Request $request, ManagerRegistry $manager, $id, Eve
 
         $em=$manager->getManager();
             //specifier l'attribut qu'on a doit supprimer (id)
-            $event=$repo->find($id);
+            $eventadmin=$repo->find($id);
 
            
-            $em->remove($event);
+            $em->remove($eventadmin);
             $em->flush();
 
 

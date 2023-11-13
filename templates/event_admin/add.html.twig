@@ -1,0 +1,55 @@
+{# templates/event_admin/add.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="container">
+        <div class="container text-center">
+            <h1>Ajouter un événement administratif</h1>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                {{ form_start(f, {'attr': {'novalidate': 'novalidate'}}) }}
+                <div class="form-group">
+                    {{ form_label(f.nom_a, 'Nom de l\'événement') }}
+                    {{ form_widget(f.nom_a, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(f.nom_a) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(f.date_a, 'Date de l\'événement') }}
+                    {{ form_widget(f.date_a, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(f.date_a) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(f.lieu_a, 'Lieu') }}
+                    {{ form_widget(f.lieu_a, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(f.lieu_a) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(f.description_a, 'Description') }}
+                    {{ form_widget(f.description_a, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(f.description_a) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(f.image_a, 'Image') }}
+                    {{ form_widget(f.image_a, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(f.image_a) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(f.prix_a, 'Prix') }}
+                    {{ form_widget(f.prix_a, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(f.prix_a) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">Ajouter</button>
+                {{ form_end(f) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ parent() }}
+    
+    <div class="container text-center">
+        <h1> Espace Admin</h1>
+        <h1>Liste des événements</h1>
+        
+        <div class="mx-auto" style="width: 70%;">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Nom de l'événement</th>
+                        <th scope="col">Date de l'événement</th>
+                        <th scope="col">Lieu</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Prix</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                        <tr class="table-active">
+                            <td>{{ event.getNomA() }}</td>
+                            <td>{{ event.getDateA()|date('d-m-Y') }}</td>
+                            <td>{{ event.getLieuA() }}</td>
+                            <td>{{ event.getDescriptionA() }}</td>
+                            <td><img src="{{ asset(event.getImageA()) }}" class="custom-block-image img-fluid" alt=""></td>
+                            <td>{{ event.getPrixA() }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ path('eventadmin_update', {'id': event.getId()}) }}" class="btn btn-primary">Edit</a>
+                                    <span style="margin-right: 10px;"></span> <!-- Ajoutez une marge à droite pour l'espace -->
+                                    <a href="{{ path('eventadmin_delete', {'id': event.getId()}) }}" class="btn btn-danger">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
