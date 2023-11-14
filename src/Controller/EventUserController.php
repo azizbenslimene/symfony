@@ -129,6 +129,11 @@ function findByRev($id, EventUserRepository $repo, ManagerRegistry $manager, Res
     $em = $manager->getManager();
     $event = $repo->find($id);
 
+
+    $eventNom = $event->getNom();
+    $eventDate = $event->getDate();
+    $eventLieu = $event->getLieu();
+    $eventPrix = $event->getPrix();
     // Créer une nouvelle réservation pour cet événement
     $reservation = new Reservation();
     $reservation->setCin(12345678);
@@ -136,6 +141,7 @@ function findByRev($id, EventUserRepository $repo, ManagerRegistry $manager, Res
     $reservation->setPrenomU('benslimene');
     $reservation->setEvent($event);
 
+   
     $em->persist($reservation);
     $em->flush();
 

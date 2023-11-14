@@ -1,0 +1,46 @@
+{% extends 'base2.html.twig' %}
+
+{% block body %}
+    {{ parent() }}
+    
+    <div class="container text-center">
+        <h1>Liste des réservations</h1>
+        
+        <div class="mx-auto" style="width: 70%;">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Nom de l'événement</th>
+                        <th scope="col">Date de l'événement</th>
+                        <th scope="col">Lieu</th>
+                        <th scope="col">Prix</th>
+                        <th scope="col">CIN</th>
+                        <th scope="col">Nom utilisateur</th>
+                        <th scope="col">Prénom utilisateur</th>
+                        <th scope="col">Actions</th> <!-- Ajout de la colonne pour les actions -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in events %}
+                    <tr class="table-active">
+                        <td>{{ reservation.event.getNom() }}</td>
+                        <td>{{ reservation.event.getDate() }}</td>
+                        <td>{{ reservation.event.getLieu() }}</td>
+                        <td>{{ reservation.event.getPrix() }}</td>
+                        <td>{{ reservation.cin }}</td>
+                        <td>{{ reservation.getNomU() }}</td>
+                        <td>{{ reservation.getPrenomU() }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ path('eventadmin_updaterev', {'id': reservation.id}) }}" class="btn btn-primary">Edit</a>
+                                <span style="margin-right: 10px;"></span> <!-- Ajoutez une marge à droite pour l'espace -->
+                                <a href="{{ path('eventadmin_deleterev', {'id': reservation.id}) }}" class="btn btn-danger">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

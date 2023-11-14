@@ -32,9 +32,9 @@
     <div class="btn-group" role="group">
         <a href="{{ path('event_update', {'id': event.id}) }}" class="btn btn-primary">Edit</a>
         <span style="margin-right: 10px;"></span> <!-- Ajoutez une marge à droite pour l'espace -->
-        <a href="{{ path('event_delete', {'id': event.id}) }}" class="btn btn-danger">Delete</a>
+        <a href="{{ path('event_delete', {'id': event.id}) }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement?')">Delete</a>
          <span style="margin-right: 10px;"></span> <!-- Ajoutez une marge à droite pour l'espace -->
-        <a href="{{ path('resv_affiche', {'id': event.id}) }}" class="btn btn-danger">Reserver</a>
+        <a href="{{ path('resv_affiche', {'id': event.id}) }}" class="btn btn-danger" >Reserver</a>
     </div>
 </td>
 

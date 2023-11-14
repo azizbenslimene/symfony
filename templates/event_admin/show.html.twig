@@ -1,0 +1,47 @@
+{% extends 'base2.html.twig' %}
+
+{% block body %}
+    {{ parent() }}
+
+    <div class="container text-center">
+        <h1>Détails de l'événement</h1>
+
+        <h2>EventUser</h2>
+        <p>Nom: {{ eventUser.nom }}</p>
+        <p>Date: {{ eventUser.date|date('d-m-Y') }}</p>
+        <p>Lieu: {{ eventUser.lieu }}</p>
+        <p>Description: {{ eventUser.description }}</p>
+        <p>Image: <img src="{{ asset(eventUser.image) }}" class="custom-block-image img-fluid" alt=""></p>
+        <p>Prix: {{ eventUser.prix }}</p>
+
+        <h2>EventAdmins associés</h2>
+        {% if eventAdmins is not empty %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Nom de l'événement</th>
+                        <th scope="col">Date de l'événement</th>
+                        <th scope="col">Lieu</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Prix</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for eventAdmin in eventAdmins %}
+                        <tr class="table-active">
+                            <td>{{ eventAdmin.nom_a }}</td>
+                            <td>{{ eventAdmin.date_a|date('d-m-Y') }}</td>
+                            <td>{{ eventAdmin.lieu_a }}</td>
+                            <td>{{ eventAdmin.description_a }}</td>
+                            <td><img src="{{ asset(eventAdmin.image_a) }}" class="custom-block-image img-fluid" alt=""></td>
+                            <td>{{ eventAdmin.prix_a }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Aucun EventAdmin associé.</p>
+        {% endif %}
+    </div>
+{% endblock %}

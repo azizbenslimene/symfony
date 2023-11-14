@@ -1,10 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends 'base2.html.twig' %}
 
 {% block body %}
     {{ parent() }}
     
     <div class="container text-center">
-        <h1> Espace Admin</h1>
         <h1>Liste des événements</h1>
         
         <div class="mx-auto" style="width: 70%;">
@@ -23,17 +22,18 @@
                 <tbody>
                     {% for event in events %}
                         <tr class="table-active">
-                            <td>{{ event.getNomA() }}</td>
-                            <td>{{ event.getDateA()|date('d-m-Y') }}</td>
-                            <td>{{ event.getLieuA() }}</td>
-                            <td>{{ event.getDescriptionA() }}</td>
-                            <td><img src="{{ asset(event.getImageA()) }}" class="custom-block-image img-fluid" alt=""></td>
-                            <td>{{ event.getPrixA() }}</td>
+                            <td>{{ event.getNomA() ?? event.getNom() }}</td>
+                            <td>{{ event.getDateA() ?? event.getDate()|date('d-m-Y') }}</td>
+                            <td>{{ event.getLieuA() ?? event.getLieu() }}</td>
+                            <td>{{ event.getDescriptionA() ?? event.getDescription() }}</td>
+                            <td><img src="{{ asset(event.getImageA() ?? event.getImage()) }}" class="custom-block-image img-fluid" alt=""></td>
+                            <td>{{ event.getPrixA() ?? event.getPrix() }}</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <a href="{{ path('eventadmin_update', {'id': event.getId()}) }}" class="btn btn-primary">Edit</a>
-                                    <span style="margin-right: 10px;"></span> <!-- Ajoutez une marge à droite pour l'espace -->
-                                    <a href="{{ path('eventadmin_delete', {'id': event.getId()}) }}" class="btn btn-danger">Delete</a>
+                                    <a href="{{ path('eventadmin_update', {'id': event.getIdA() ?? event.getId()}) }}" class="btn btn-primary">Edit</a>
+                                    <span style="margin-right: 10px;"></span>
+                                    <a href="{{ path('eventadmin_delete', {'id': event.getIdA() ?? event.getId()}) }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement?')">Delete</a>
+                                    <!-- Ajoutez d'autres actions au besoin -->
                                 </div>
                             </td>
                         </tr>

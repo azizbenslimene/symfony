@@ -46,12 +46,17 @@ class EventUser
     #[Assert\Type(type:"integer", message:"Le prix doit être un entier.")]
     private ?int $prix = null;
 
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Reservation::class)]
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Reservation::class )]
+    #[ORM\JoinColumn(name:"event_id", referencedColumnName:"id", onDelete:"CASCADE")]
     private Collection $reservations;
+
+    #[ORM\ManyToMany(targetEntity: EventAdmin::class, mappedBy: 'id_ev')]
+    private Collection $eventAdmins;
 
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
+        $this->eventAdmins = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -132,7 +137,7 @@ class EventUser
     }
 
     /**
-     * @return Collection<int, Reservation>
+     * @return Collection|Reservation[]
      */
     public function getReservations(): Collection
     {
@@ -156,6 +161,33 @@ class EventUser
             if ($reservation->getEvent() === $this) {
                 $reservation->setEvent(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EventAdmin>
+     */
+    public function getEventAdmins(): Collection
+    {
+        return $this->eventAdmins;
+    }
+
+    public function addEventAdmin(EventAdmin $eventAdmin): static
+    {
+        if (!$this->eventAdmins->contains($eventAdmin)) {
+            $this->eventAdmins->add($eventAdmin);
+            $eventAdmin->addIdEv($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEventAdmin(EventAdmin $eventAdmin): static
+    {
+        if ($this->eventAdmins->removeElement($eventAdmin)) {
+            $eventAdmin->removeIdEv($this);
         }
 
         return $this;
