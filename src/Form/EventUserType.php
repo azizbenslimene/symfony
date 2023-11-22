@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class EventUserType extends AbstractType
 {
@@ -15,13 +16,17 @@ class EventUserType extends AbstractType
     {
         $builder
         ->add('nom')
-        ->add('date')
-        /*, DateType::class, [
-            'widget' => 'single_text', // Utilisez 'single_text' pour afficher un champ de texte pour la date
-            'html5' => false, // Désactivez l'attribut HTML5 pour permettre la personnalisation
-            'format' => 'dd-MM-yyyy', // Définissez le format de la date
-            'attr' => ['class' => 'datepicker'], // Ajoutez des classes CSS pour le style
-        ])*/
+        ->add('date', DateType::class, [
+            'widget' => 'single_text',
+            'html5' => false,
+            'format' => 'dd-MM-yyyy',
+            'input' => 'string', // Ajoutez cette ligne
+            'invalid_message' => 'Format de date invalide.',
+            'attr' => [
+                'class' => 'datepicker',
+                'pattern' => '\d{2}-\d{2}-\d{4}',  // Ajoutez le pattern ici
+            ],
+        ])
         
         ->add('lieu',ChoiceType::class, [
             'choices'=>['Nabeul'=>'nabeul','Tunis'=>'tunis','Ariana'=>'ariana'],])

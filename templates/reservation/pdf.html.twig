@@ -1,0 +1,65 @@
+{# pdf_template.html.twig #}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Réservation d'événement</title>
+    <style>
+        /* Ajoutez des styles CSS selon vos besoins pour le rendu PDF */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        h1 {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Détails de la réservation</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom de l'événement</th>
+                    <th>Date de l'événement</th>
+                    <th>Lieu</th>
+                    <th>Prix</th>
+                    <th>CIN</th>
+                    <th>Nom utilisateur</th>
+                    <th>Prénom utilisateur</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ reservation.event.getNom() }}</td>
+                    <td>{{ reservation.event.getDate() }}</td>
+                    <td>{{ reservation.event.getLieu() }}</td>
+                    <td>{{ reservation.event.getPrix() }}</td>
+                    <td>{{ reservation.cin }}</td>
+                    <td>{{ reservation.getNomU() }}</td>
+                    <td>{{ reservation.getPrenomU() }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

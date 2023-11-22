@@ -17,21 +17,24 @@
                         <th scope="col">CIN</th>
                         <th scope="col">Nom utilisateur</th>
                         <th scope="col">Prénom utilisateur</th>
-                        
+                        <th scope="col">Imprimer</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for reservation in events %}
-                    <tr class="table-active">
-                        <td>{{ reservation.event.getNom()}}</td>
-                        <td>{{ reservation.event.getDate()}}</td>
-                        <td>{{ reservation.event.getLieu()}}</td>
-                        <td>{{ reservation.event.getPrix()}}</td>
-                        <td>{{ reservation.cin }}</td>
-                        <td>{{ reservation.getNomU() }}</td>
-                        <td>{{ reservation.getPrenomU() }}</td>
-                       
-                    </tr>
+                        <tr class="table-active">
+                            <td>{{ reservation.event.getNom() }}</td>
+                            <td>{{ reservation.event.getDate() }}</td>
+                            <td>{{ reservation.event.getLieu() }}</td>
+                            <td>{{ reservation.event.getPrix() }}</td>
+                            <td>{{ reservation.cin }}</td>
+                            <td>{{ reservation.getNomU() }}</td>
+                            <td>{{ reservation.getPrenomU() }}</td>
+                            <td>
+                                <a href="{{ path('generate_pdf', {'id': reservation.id}) }}" target="_blank">Imprimer</a>
+                            </td>
+                          
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

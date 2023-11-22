@@ -21,6 +21,57 @@ class EventUserRepository extends ServiceEntityRepository
         parent::__construct($registry, EventUser::class);
     }
 
+    /**
+     * @param string|null $searchNom
+     * @param string|null $searchLieu
+     * @return EventUser[]
+     */
+    public function findBySearchCriteria(?string $searchNom, ?string $searchLieu): array
+    {
+        $queryBuilder = $this->createQueryBuilder('e');
+
+        // Ajoutez des clauses WHERE conditionnelles en fonction des critères de recherche
+        if ($searchNom) {
+            $queryBuilder->andWhere('e.nom LIKE :searchNom')
+                ->setParameter('searchNom', '%' . $searchNom . '%');
+        }
+
+        if ($searchLieu) {
+            $queryBuilder->andWhere('e.lieu LIKE :searchLieu')
+                ->setParameter('searchLieu', '%' . $searchLieu . '%');
+        }
+
+        // Exécutez la requête et retournez les résultats
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function deleteExpiredEvents()
+    {
+        $entityManager = $this->getEntityManager();
+
+        // Date actuelle
+        $currentDate = new \DateTime();
+
+        // Date seuil (24 heures avant la date actuelle)
+        $thresholdDate = clone $currentDate;
+        $thresholdDate->sub(new \DateInterval('P1D'));
+
+        // Récupérer les événements expirés
+        $expiredEvents = $this->createQueryBuilder('e')
+            ->where('CAST(e.date AS datetime) < :thresholdDate')
+            ->setParameter('thresholdDate', $thresholdDate)
+            ->getQuery()
+            ->getResult();
+
+        // Supprimer les événements expirés
+        foreach ($expiredEvents as $event) {
+            $entityManager->remove($event);
+        }
+
+        $entityManager->flush();
+    }
+    }
+
 //    /**
 //     * @return EventUser[] Returns an array of EventUser objects
 //     */
@@ -58,4 +109,4 @@ class EventUserRepository extends ServiceEntityRepository
 }*/
 
 
-}
+

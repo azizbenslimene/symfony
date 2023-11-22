@@ -7,10 +7,16 @@ use App\Entity\Reservation;
 use App\Form\EventUserType;
 use App\Repository\EventUserRepository;
 use App\Repository\ReservationRepository;
+
+
+use Endroid\QrCodeBundle\Response\QrCodeResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Endroid\QrCode\QrCode;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -27,8 +33,12 @@ class EventUserController extends AbstractController
     
 
     #[Route('/EventgetAll', name: 'eventuser_getall')]
-    public function getAll (EventUserRepository $repo): Response{
-        $list = $repo->findAll(); /*select * from author*/
+    public function getAll (Request $request,EventUserRepository $repo): Response{
+        $searchNom = $request->query->get('search_nom');
+    $searchLieu = $request->query->get('search_lieu');
+
+    $list = $repo->findBySearchCriteria($searchNom, $searchLieu);
+
         return $this->render('event_user/getall.html.twig',['events' => $list]);
 
 }
@@ -123,36 +133,91 @@ public function updateEvent(Request $request, ManagerRegistry $manager, $id, Eve
  
     
 
-    #[Route('/list_resv/{id}', name: 'resv_affiche')]
-function findByRev($id, EventUserRepository $repo, ManagerRegistry $manager, ReservationRepository $reservationRepository): Response
+
+
+#[Route('/list_resv/{id}', name: 'resv_affiche')]
+public function afficher_reserv($id, EventUserRepository $repo, ManagerRegistry $manager, ReservationRepository $reservationRepository): Response
 {
-    $em = $manager->getManager();
+    $entityManager = $manager->getManager();
     $event = $repo->find($id);
 
+    // Vérifier si le nombre de réservations est inférieur au maximum
+    $maxReservations = 3; // Nombre maximum de réservations par événement
 
-    $eventNom = $event->getNom();
-    $eventDate = $event->getDate();
-    $eventLieu = $event->getLieu();
-    $eventPrix = $event->getPrix();
-    // Créer une nouvelle réservation pour cet événement
-    $reservation = new Reservation();
-    $reservation->setCin(12345678);
-    $reservation->setNomU('aziz');
-    $reservation->setPrenomU('benslimene');
-    $reservation->setEvent($event);
+    if (count($event->getReservations()) < $maxReservations) {
+        // Créer une nouvelle réservation pour cet événement
+        $reservation = new Reservation();
+        $reservation->setCin(12345678);
+        $reservation->setNomU('aziz');
+        $reservation->setPrenomU('benslimene');
+        $reservation->setEvent($event);
 
-   
-    $em->persist($reservation);
-    $em->flush();
+        $entityManager->persist($reservation);
+        $entityManager->flush();
 
-    // Récupérer la liste de toutes les réservations
-    $list = $reservationRepository->findAll();
+         // Récupérer la liste de toutes les réservations
+        $list = $reservationRepository->findAll();
 
-    return $this->render('event_user/getresv.html.twig', [
-        'events' => $list,
-    ]);
+        // Ajouter un message de succès
+       
+
+        // Rediriger vers la liste des événements après la réservation réussie
+        return $this->render('event_user/getresv.html.twig', [
+            'events' => $list,
+        ]);
+    } else {
+        // Ajouter un message d'erreur si le nombre de réservations est complet
+        $this->addFlash('error', 'Le nombre de places est complet pour cet événement.');
+
+        // Rediriger vers la liste des événements sans passer à l'interface getresv.html.twig
+        return $this->redirectToRoute('eventuser_getall');
+    }
 }
+
+
+
+
+#[Route('/generate-pdf/{id}', name: 'generate_pdf')]
+public function generatePdf($id, ReservationRepository $reservationRepository)
+{
+    // Récupérer la réservation depuis la base de données
+    $reservation = $reservationRepository->find($id);
+
+    // Générer le contenu HTML du PDF (vous devrez créer un fichier twig pour cela)
+    $html = $this->renderView('event_user/pdf.html.twig', [
+        'reservation' => $reservation,
+    ]);
+
+    // Utiliser la bibliothèque Dompdf pour générer le PDF
+    $options = new Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isPhpEnabled', true);
+
+    $dompdf = new Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    // Créer une réponse avec le contenu PDF et le type de contenu approprié
+    $response = new Response($dompdf->output());
+    $response->headers->set('Content-Type', 'application/pdf');
+    $response->headers->set('Content-Disposition', 'inline; filename="reservation.pdf"');
+
+    return $response;
+}
+
+
+/*
+#[Route('/deleteExpiredEvents', name: 'delete_expired_events')]
+public function deleteExpiredEvents(EventUserRepository $eventUserRepository): Response
+{
+    // Appeler la fonction de suppression des événements expirés
+    $eventUserRepository->deleteExpiredEvents();
+
+    // Vous pouvez rediriger vers une page appropriée ou afficher un message
+    return $this->redirectToRoute('eventuser_getall');
+}*/
+} 
+       
 
     
-
-}
