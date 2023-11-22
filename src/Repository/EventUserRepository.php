@@ -45,30 +45,15 @@ class EventUserRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function deleteExpiredEvents()
+    public function findEvenementsExpirees(): array
     {
-        $entityManager = $this->getEntityManager();
+        $dateLimite = new \DateTime('-24 hours');
 
-        // Date actuelle
-        $currentDate = new \DateTime();
-
-        // Date seuil (24 heures avant la date actuelle)
-        $thresholdDate = clone $currentDate;
-        $thresholdDate->sub(new \DateInterval('P1D'));
-
-        // Récupérer les événements expirés
-        $expiredEvents = $this->createQueryBuilder('e')
-            ->where('CAST(e.date AS datetime) < :thresholdDate')
-            ->setParameter('thresholdDate', $thresholdDate)
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.date <= :dateLimite')
+            ->setParameter('dateLimite', $dateLimite)
             ->getQuery()
             ->getResult();
-
-        // Supprimer les événements expirés
-        foreach ($expiredEvents as $event) {
-            $entityManager->remove($event);
-        }
-
-        $entityManager->flush();
     }
     }
 

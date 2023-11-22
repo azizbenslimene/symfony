@@ -9,6 +9,7 @@ use App\Repository\EventUserRepository;
 use App\Repository\ReservationRepository;
 
 
+use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCodeBundle\Response\QrCodeResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,13 +34,17 @@ class EventUserController extends AbstractController
     
 
     #[Route('/EventgetAll', name: 'eventuser_getall')]
-    public function getAll (Request $request,EventUserRepository $repo): Response{
+    public function getAll (Request $request,EventUserRepository $repo, ManagerRegistry $manager): Response{
         $searchNom = $request->query->get('search_nom');
     $searchLieu = $request->query->get('search_lieu');
 
     $list = $repo->findBySearchCriteria($searchNom, $searchLieu);
+    $this->supprimerEvenementsExpirees($repo, $manager);
+
+
 
         return $this->render('event_user/getall.html.twig',['events' => $list]);
+        
 
 }
 
@@ -206,18 +211,52 @@ public function generatePdf($id, ReservationRepository $reservationRepository)
     return $response;
 }
 
-
-/*
-#[Route('/deleteExpiredEvents', name: 'delete_expired_events')]
-public function deleteExpiredEvents(EventUserRepository $eventUserRepository): Response
+private function supprimerEvenementsExpirees(EventUserRepository $eventUserRepository, ManagerRegistry $manager): void
 {
-    // Appeler la fonction de suppression des événements expirés
-    $eventUserRepository->deleteExpiredEvents();
+    // Récupérer les événements expirés
+    $evenementsExpirees = $eventUserRepository->findEvenementsExpirees();
 
-    // Vous pouvez rediriger vers une page appropriée ou afficher un message
-    return $this->redirectToRoute('eventuser_getall');
-}*/
-} 
+    // Supprimer les événements expirés
+    $entityManager = $manager->getManager();
+    foreach ($evenementsExpirees as $evenement) {
+        $entityManager->remove($evenement);
+    }
+    $entityManager->flush();
+}
+
+
+#[Route('/event/generate-qr/{id}', name: 'event_generate_qr')]
+public function generateQrCode($id, EventUserRepository $repo): Response
+{
+    $event = $repo->find($id);
+
+    // Générer le contenu du QR Code (utilisez toutes les informations de l'événement)
+    $qrContent = sprintf(
+        "Nom de l'événement:  %s\nLieu: %s\nDescription: %s\nPrix: %s",
+        $event->getNom(),
+        $event->getLieu(),
+        $event->getDescription(),
+        $event->getPrix()
+    );
+
+    // Créer une instance de QrCode
+    $qrCode = new QrCode($qrContent);
+
+    // Retourner une réponse avec l'image du QR Code
+    // Créer une instance de PngWriter pour générer le résultat sous forme d'image PNG
+    $writer = new PngWriter();
+    $result = $writer->write($qrCode);
+
+    // Créer une réponse avec le résultat du QR Code
+    $response = new Response($result->getString(), Response::HTTP_OK, [
+        'Content-Type' => $result->getMimeType(),
+    ]);
+
+    return $response;
+}
+}
+
+
        
 
     

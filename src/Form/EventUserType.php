@@ -20,11 +20,8 @@ class EventUserType extends AbstractType
             'widget' => 'single_text',
             'html5' => false,
             'format' => 'dd-MM-yyyy',
-            'input' => 'string', // Ajoutez cette ligne
-            'invalid_message' => 'Format de date invalide.',
             'attr' => [
                 'class' => 'datepicker',
-                'pattern' => '\d{2}-\d{2}-\d{4}',  // Ajoutez le pattern ici
             ],
         ])
         

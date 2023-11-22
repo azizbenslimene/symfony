@@ -55,15 +55,14 @@
                             <td>{{ event.description }}</td>
                             <td><img src="{{ asset(event.image) }}" class="custom-block-image img-fluid" alt=""></td>
                             <td>{{ event.prix }}</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{{ path('event_update', {'id': event.id}) }}" class="btn btn-primary">Edit</a>
-                                    <span style="margin-right: 10px;"></span>
-                                    <a href="{{ path('event_delete', {'id': event.id}) }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement?')">Delete</a>
-                                    <span style="margin-right: 10px;"></span>
-                                    <a href="{{ path('resv_affiche', {'id': event.id}) }}" class="btn btn-danger">Reserver</a>
-                                </div>
-                            </td>
+                         <td>
+    <div class="btn-group d-flex align-items-center" role="group">
+        <a href="{{ path('event_update', {'id': event.id}) }}" class="btn btn-primary" style="margin-right: 10px;">Éditer</a>
+        <a href="{{ path('event_delete', {'id': event.id}) }}" class="btn btn-danger" style="margin-right: 10px; onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement?')">Supprimer</a>
+        <a href="{{ path('resv_affiche', {'id': event.id}) }}" class="btn btn-secondary" style="margin-right: 10px;">Réserver</a>
+        <a href="{{ path('event_generate_qr', {'id': event.id}) }}" class="btn btn-secondary"> QR</a>
+    </div>
+</td>
                         </tr>
                     {% endfor %}
                 </tbody>
