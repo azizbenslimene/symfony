@@ -65,7 +65,7 @@ public function addEvent(Request $req, ManagerRegistry $manager): Response
 
         foreach ($forbiddenWords as $word) {
             if (strpos($description, $word) !== false) {
-                $this->addFlash('error', 'Faite Attention,La description ne doit pas contenir des mots interdits.');
+                $this->addFlash('error', 'Faite Attention,La description contient des mots interdits.');
                 
                 // Vous pouvez rediriger vers le formulaire ou une autre page en cas d'erreur.
                 return $this->redirectToRoute('author_add');
