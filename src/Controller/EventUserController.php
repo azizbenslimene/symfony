@@ -49,38 +49,55 @@ class EventUserController extends AbstractController
 }
 
 #[Route('/addEventForm', name: 'author_add')]
-public function addEvent(Request $req, ManagerRegistry $manager): Response{
-    $em = $manager -> getManager();
+public function addEvent(Request $req, ManagerRegistry $manager): Response
+{
+    $em = $manager->getManager();
     $eventuser = new EventUser;
-   //Appel formulaire
-   $form=$this->createForm(EventUserType::class,$eventuser);
-   $form->handleRequest($req);
 
-   if ($form->isSubmitted() && $form->isValid()) {
-    $uploadedFile =  $form->get('image')->getData();
-    // $uploadedFile = $req->request->all(); // $form['image']->getData();
-    // dd($uploadedFile);
-    // dd($uploadedFile['event_user']['image']);
+    // Appel du formulaire
+    $form = $this->createForm(EventUserType::class, $eventuser);
+    $form->handleRequest($req);
 
-    if ($uploadedFile) {
-        $imageDirectory = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);; // Your specified image directory
-        $newFilename = uniqid().'.'.$uploadedFile->guessExtension();
-        // dd($newFilename);
-        try {
-            $destination = $this->getParameter('kernel.project_dir').'/public/uploads';
-            $uploadedFile->move($destination, $newFilename);
-        } catch (FileException $e) {
-            // Handle the file upload exception
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Vérification des mots interdits dans la description
+        $forbiddenWords = ['israel', 'america', 'kill'];
+        $description = strtolower($eventuser->getDescription());
+
+        foreach ($forbiddenWords as $word) {
+            if (strpos($description, $word) !== false) {
+                $this->addFlash('error', 'Faite Attention,La description ne doit pas contenir des mots interdits.');
+                
+                // Vous pouvez rediriger vers le formulaire ou une autre page en cas d'erreur.
+                return $this->redirectToRoute('author_add');
+            }
         }
 
-        $eventuser->setImage('uploads/'.$newFilename);
+        // Gestion du téléchargement de l'image
+        $uploadedFile = $form->get('image')->getData();
+
+        if ($uploadedFile) {
+            // Logique de téléchargement de l'image ici
+            $imageDirectory = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $newFilename = uniqid().'.'.$uploadedFile->guessExtension();
+
+            try {
+                $destination = $this->getParameter('kernel.project_dir').'/public/uploads';
+                $uploadedFile->move($destination, $newFilename);
+            } catch (FileException $e) {
+                // Gérer l'exception en cas d'échec du téléchargement
+            }
+
+            $eventuser->setImage('uploads/'.$newFilename);
+        }
+
+        // Persistez l'entité dans la base de données
+        $em->persist($eventuser);
+        $em->flush();
+
+        return $this->redirectToRoute('eventuser_getall');
     }
 
-    $em->persist($eventuser);
-    $em->flush();
-    return $this->redirectToRoute('eventuser_getall') ;
-}
-return $this->renderForm('event_user/add.html.twig',['f'=>$form]);
+    return $this->renderForm('event_user/add.html.twig', ['f' => $form]);
 }
 
 #[Route('/updateEvent/{id}', name: 'event_update')]

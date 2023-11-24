@@ -16,14 +16,7 @@ class EventUserType extends AbstractType
     {
         $builder
         ->add('nom')
-        ->add('date', DateType::class, [
-            'widget' => 'single_text',
-            'html5' => false,
-            'format' => 'dd-MM-yyyy',
-            'attr' => [
-                'class' => 'datepicker',
-            ],
-        ])
+        ->add('date')
         
         ->add('lieu',ChoiceType::class, [
             'choices'=>['Nabeul'=>'nabeul','Tunis'=>'tunis','Ariana'=>'ariana'],])

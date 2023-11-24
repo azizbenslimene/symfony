@@ -200,16 +200,6 @@ class EventUser
 
     public function validateDate(ExecutionContextInterface $context): void
     {
-        // Valider le format de date
-        $format = 'd-MM-yyyy'; // Format attendu
-        $dateString = $this->date;
-
-        $date = \DateTime::createFromFormat($format, $dateString);
-
-        if (!$date || $date->format($format) !== $dateString) {
-            $context->buildViolation('Le format de date n\'est pas valide.')
-                ->atPath('date')
-                ->addViolation();
-        }
+        
     }
 }
