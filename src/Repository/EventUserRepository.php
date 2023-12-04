@@ -27,24 +27,25 @@ class EventUserRepository extends ServiceEntityRepository
      * @return EventUser[]
      */
     public function findBySearchCriteria(?string $searchNom, ?string $searchLieu): array
-    {
-        $queryBuilder = $this->createQueryBuilder('e');
+{
+    $queryBuilder = $this->createQueryBuilder('e');
 
-        // Ajoutez des clauses WHERE conditionnelles en fonction des critères de recherche
-        if ($searchNom) {
-            $queryBuilder->andWhere('e.nom LIKE :searchNom')
-                ->setParameter('searchNom', '%' . $searchNom . '%');
-        }
-
-        if ($searchLieu) {
-            $queryBuilder->andWhere('e.lieu LIKE :searchLieu')
-                ->setParameter('searchLieu', '%' . $searchLieu . '%');
-        }
-
-        // Exécutez la requête et retournez les résultats
-        return $queryBuilder->getQuery()->getResult();
+    // Ajoutez des clauses WHERE conditionnelles en fonction des critères de recherche
+    if ($searchNom) {
+        $queryBuilder
+            ->andWhere($queryBuilder->expr()->like('e.nom', ':searchNom'))
+            ->setParameter('searchNom', '%' . $searchNom . '%');
     }
 
+    if ($searchLieu) {
+        $queryBuilder
+            ->andWhere($queryBuilder->expr()->like('e.lieu', ':searchLieu'))
+            ->setParameter('searchLieu', '%' . $searchLieu . '%');
+    }
+
+    // Exécutez la requête et retournez les résultats
+    return $queryBuilder->getQuery()->getResult();
+}
     public function findEvenementsExpirees(): array
     {
         $dateLimite = new \DateTime('-24 hours');

@@ -12,6 +12,7 @@ use App\Repository\ReservationRepository;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCodeBundle\Response\QrCodeResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
@@ -34,19 +35,41 @@ class EventUserController extends AbstractController
     
 
     #[Route('/EventgetAll', name: 'eventuser_getall')]
-    public function getAll (Request $request,EventUserRepository $repo, ManagerRegistry $manager): Response{
+    public function getAll(Request $request, EventUserRepository $repo, ManagerRegistry $manager): Response
+    {
         $searchNom = $request->query->get('search_nom');
-    $searchLieu = $request->query->get('search_lieu');
+        $searchLieu = $request->query->get('search_lieu');
 
-    $list = $repo->findBySearchCriteria($searchNom, $searchLieu);
-    $this->supprimerEvenementsExpirees($repo, $manager);
+        // Call the method to search with the provided criteria
+        $list = $repo->findBySearchCriteria($searchNom, $searchLieu);
+        $this->supprimerEvenementsExpirees($repo, $manager);
 
+        // Check if the request is an AJAX request
+        if ($request->isXmlHttpRequest()) {
+            // Return a JSON response with the search results
+            $events = [];
+            foreach ($list as $event) {
+                $events[] = [
+                    'nom' => $event->getNom(),
+                    'date' => $event->getDate(),
+                    'lieu' => $event->getLieu(),
+                    'description' => $event->getDescription(),
+                    'image' => $event->getImage(),
+                    'prix' => $event->getPrix(),
+                    'editLink' => $this->generateUrl('event_update', ['id' => $event->getId()]),
+                    'deleteLink' => $this->generateUrl('event_delete', ['id' => $event->getId()]),
+                    'reserveLink' => $this->generateUrl('resv_affiche', ['id' => $event->getId()]),
+                    'qrLink' => $this->generateUrl('event_generate_qr', ['id' => $event->getId()]),
+                ];
+            }
+    
+            // Return a JSON response with the search results
+            return new JsonResponse(['events' => $events]);
+        }
 
-
-        return $this->render('event_user/getall.html.twig',['events' => $list]);
-        
-
-}
+        // Render the template for non-AJAX requests
+        return $this->render('event_user/getall.html.twig', ['events' => $list]);
+    }
 
 #[Route('/addEventForm', name: 'author_add')]
 public function addEvent(Request $req, ManagerRegistry $manager): Response
@@ -54,7 +77,7 @@ public function addEvent(Request $req, ManagerRegistry $manager): Response
     $em = $manager->getManager();
     $eventuser = new EventUser;
 
-    // Appel du formulaire
+    
     $form = $this->createForm(EventUserType::class, $eventuser);
     $form->handleRequest($req);
 
@@ -249,8 +272,9 @@ public function generateQrCode($id, EventUserRepository $repo): Response
 
     // Générer le contenu du QR Code (utilisez toutes les informations de l'événement)
     $qrContent = sprintf(
-        "Nom de l'événement:  %s\nLieu: %s\nDescription: %s\nPrix: %s",
+        "Nom de l'événement:   %s\nDate: %s\nLieu: %s\nDescription: %s\nPrix: %s",
         $event->getNom(),
+        $event->getDate(),
         $event->getLieu(),
         $event->getDescription(),
         $event->getPrix()

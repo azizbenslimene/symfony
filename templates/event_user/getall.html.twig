@@ -19,8 +19,9 @@
                 {{ flash_message }}
             </div>
         {% endfor %}
-{# Formulaire de recherche #}
-        <form method="get" action="{{ path('eventuser_getall') }}">
+
+        {# Formulaire de recherche AJAX #}
+        <form id="searchForm">
             <div class="row mb-3">
                 <div class="col">
                     <input type="text" class="form-control" name="search_nom" placeholder="Nom de l'événement">
@@ -28,11 +29,10 @@
                 <div class="col">
                     <input type="text" class="form-control" name="search_lieu" placeholder="Lieu">
                 </div>
-                <div class="col">
-                    <button type="submit" class="btn btn-primary">Rechercher</button>
-                </div>
+              
             </div>
         </form>
+
         <div class="mx-auto" style="width: 70%;">
             <table class="table table-hover">
                 <thead>
@@ -46,7 +46,7 @@
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="eventTableBody"> {# Add the id here #}
                     {% for event in events %}
                         <tr class="table-active">
                             <td>{{ event.nom }}</td>
@@ -55,18 +55,92 @@
                             <td>{{ event.description }}</td>
                             <td><img src="{{ asset(event.image) }}" class="custom-block-image img-fluid" alt=""></td>
                             <td>{{ event.prix }}</td>
-                         <td>
-    <div class="btn-group d-flex align-items-center" role="group">
-        <a href="{{ path('event_update', {'id': event.id}) }}" class="btn btn-primary" style="margin-right: 10px;">Éditer</a>
-        <a href="{{ path('event_delete', {'id': event.id}) }}" class="btn btn-danger" style="margin-right: 10px; onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement?')">Supprimer</a>
-        <a href="{{ path('resv_affiche', {'id': event.id}) }}" class="btn btn-secondary" style="margin-right: 10px;">Réserver</a>
-        <a href="{{ path('event_generate_qr', {'id': event.id}) }}" class="btn btn-secondary"> QR</a>
-    </div>
-</td>
+                            <td>
+                                <div class="btn-group d-flex align-items-center" role="group">
+                                    <a href="{{ path('event_update', {'id': event.id}) }}" class="btn btn-primary" style="margin-right: 10px;">Éditer</a>
+                                    <a href="{{ path('event_delete', {'id': event.id}) }}" class="btn btn-danger" style="margin-right: 10px;" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement?')">Supprimer</a>
+                                    <a href="{{ path('resv_affiche', {'id': event.id}) }}" class="btn btn-secondary" style="margin-right: 10px;">Réserver</a>
+                                    <a href="{{ path('event_generate_qr', {'id': event.id}) }}" class="btn btn-secondary"> QR</a>
+                                </div>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Listen for input changes in the search fields
+            $('input[name="search_nom"], input[name="search_lieu"]').on('input', function () {
+                // Trigger the search function when input changes
+                searchEvents();
+            });
+        });
+
+        function searchEvents() {
+            console.log('searchEvents');
+
+            var searchNom = document.querySelector('input[name="search_nom"]').value;
+            var searchLieu = document.querySelector('input[name="search_lieu"]').value;
+
+            console.log('Search Nom:', searchNom);
+            console.log('Search Lieu:', searchLieu);
+
+            // Effectuer une requête AJAX pour récupérer les résultats
+            $.ajax({
+                url: '{{ path('eventuser_getall') }}',
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    search_nom: searchNom,
+                    search_lieu: searchLieu
+                },
+                success: function (response) {
+                    // Replace the entire HTML content of the table with the updated data
+                    updateTableContent(response.events);
+                },
+                error: function (error) {
+                    console.error('Erreur AJAX:', error);
+                }
+            });
+        }
+
+        function updateTableContent(events) {
+            // Assuming you have a tbody element with the ID 'eventTableBody'
+            var tableBody = $('#eventTableBody');
+
+            // Clear existing table rows
+            tableBody.empty();
+
+            // Iterate over the events and append rows to the table
+            for (var i = 0; i < events.length; i++) {
+                var event = events[i];
+
+                // Create a table row
+                var row = '<tr class="table-active">' +
+                    '<td>' + event.nom + '</td>' +
+                    '<td>' + event.date + '</td>' +
+                    '<td>' + event.lieu + '</td>' +
+                    '<td>' + event.description + '</td>' +
+                    '<td><img src="' + event.image + '" class="custom-block-image img-fluid" alt=""></td>' +
+                    '<td>' + event.prix + '</td>' +
+                    '<td>' +
+                    '<div class="btn-group d-flex align-items-center" role="group">' +
+                    '<a href="' + event.editLink + '" class="btn btn-primary" style="margin-right: 10px;">Éditer</a>' +
+                    '<a href="' + event.deleteLink + '" class="btn btn-danger" style="margin-right: 10px;" onclick="return confirm(\'Êtes-vous sûr de vouloir supprimer cet événement?\')">Supprimer</a>' +
+                    '<a href="' + event.reserveLink + '" class="btn btn-secondary" style="margin-right: 10px;">Réserver</a>' +
+                    '<a href="' + event.qrLink + '" class="btn btn-secondary"> QR</a>' +
+                    '</div>' +
+                    '</td>' +
+                    '</tr>';
+
+                // Append the row to the table body
+                tableBody.append(row);
+            }
+        }
+    </script>
+
 {% endblock %}
